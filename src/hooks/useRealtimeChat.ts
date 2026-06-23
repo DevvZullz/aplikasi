@@ -19,8 +19,13 @@ export function useRealtimeChat(conversationId: string, userId: string) {
       )
       .on('broadcast', { event: 'typing' }, ({ payload }) => {
         if (payload.userId !== userId) {
-          setTypingUsers((prev) => Array.from(new Set([...prev, payload.userId])));
-          setTimeout(() => setTypingUsers((p) => p.filter((id) => id !== payload.userId)), 2000);
+          setTypingUsers((prev) => {
+            const next = Array.from(new Set(prev.concat(payload.userId)));
+            return next;
+          });
+          setTimeout(() => {
+            setTypingUsers((p) => p.filter((id) => id !== payload.userId));
+          }, 2000);
         }
       })
       .subscribe();
@@ -31,7 +36,11 @@ export function useRealtimeChat(conversationId: string, userId: string) {
   }, [conversationId, userId]);
 
   const sendTyping = () => {
-    supabase.channel(`chat:${conversationId}`).send({ type: 'broadcast', event: 'typing', payload: { userId } });
+    supabase.channel(`chat:${conversationId}`).send({
+      type: 'broadcast',
+      event: 'typing',
+      payload: { userId },
+    });
   };
 
   const markAsRead = async (messageId: string) => {

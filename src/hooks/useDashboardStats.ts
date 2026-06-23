@@ -13,8 +13,18 @@ export function useDashboardStats(userId: string) {
       .channel('activity-feed')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'activity_logs', filter: `user_id=eq.${userId}` },
-        (payload) => setActivity((prev) => [payload.new, ...prev].slice(0, 20))
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'activity_logs',
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          setActivity((prev) => {
+            const next = [payload.new, ...prev];
+            return next.slice(0, 20);
+          });
+        }
       )
       .subscribe();
 

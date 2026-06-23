@@ -19,7 +19,7 @@ export function useRealtimeChat(conversationId: string, userId: string) {
       )
       .on('broadcast', { event: 'typing' }, ({ payload }) => {
         if (payload.userId !== userId) {
-          setTypingUsers((prev) => [...new Set([...prev, payload.userId])]);
+          setTypingUsers((prev) => Array.from(new Set([...prev, payload.userId])));
           setTimeout(() => setTypingUsers((p) => p.filter((id) => id !== payload.userId)), 2000);
         }
       })

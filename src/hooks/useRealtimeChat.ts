@@ -19,10 +19,13 @@ export function useRealtimeChat(conversationId: string, userId: string) {
       )
       .on('broadcast', { event: 'typing' }, ({ payload }) => {
         if (payload.userId !== userId) {
-          setTypingUsers((prev) => {
-            const next = Array.from(new Set(prev.concat(payload.userId)));
-            return next;
-          });
+          const addUser = (prev: string[]) => {
+            const combined = prev.concat([payload.userId]);
+            const unique: string[] = [];
+            combined.forEach((id) => { if (!unique.includes(id)) unique.push(id); });
+            return unique;
+          };
+          setTypingUsers(addUser);
           setTimeout(() => {
             setTypingUsers((p) => p.filter((id) => id !== payload.userId));
           }, 2000);

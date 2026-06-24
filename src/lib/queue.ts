@@ -1,4 +1,4 @@
 import { Queue } from 'bullmq';
-import { redisConnection } from './redis';
+import { bullMQConnection } from './redis';
 
-export const downloadQueue = new Queue('video-download', { connection: redisConnection });
+export const downloadQueue = new Queue('video-download', { connection: bullMQConnection });

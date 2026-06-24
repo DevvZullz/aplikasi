@@ -4,17 +4,20 @@ const globalForRedis = globalThis as unknown as { redis: Redis };
 
 export const redisConnection =
   globalForRedis.redis ??
-  new Redis(process.env.REDIS_URL!, { maxRetriesPerRequest: null, enableReadyCheck: false });
+  new Redis(process.env.REDIS_URL!, { maxRetriesPerRequest: null });
 
 if (process.env.NODE_ENV !== 'production') globalForRedis.redis = redisConnection;
 
-// Connection options untuk BullMQ (v5 butuh IORedis options, bukan instance)
-const redisUrl = new URL(process.env.REDIS_URL ?? 'redis://localhost:6379');
-export const bullMQConnection = {
-  host: redisUrl.hostname,
-  port: Number(redisUrl.port) || 6379,
-  password: redisUrl.password || undefined,
-  tls: redisUrl.protocol === 'rediss:' ? {} : undefined,
-  maxRetriesPerRequest: null,
-  enableReadyCheck: false,
+export const redisConnectionOptions = {
+  host: process.env.REDIS_URL
+    ? new URL(process.env.REDIS_URL).hostname
+    : 'localhost',
+  port: process.env.REDIS_URL
+    ? parseInt(new URL(process.env.REDIS_URL).port || '6379')
+    : 6379,
+  password: process.env.REDIS_URL
+    ? new URL(process.env.REDIS_URL).password
+    : undefined,
+  tls: process.env.REDIS_URL?.startsWith('rediss://') ? {} : undefined,
+  maxRetriesPerRequest: null as null,
 };

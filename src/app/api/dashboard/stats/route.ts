@@ -8,7 +8,7 @@ export async function GET() {
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const userId = (session.user as any).id;
-  const cacheKey = `stats:${userId}`;
+  const cacheKey = 'stats:' + userId;
 
   const cached = await redisConnection.get(cacheKey);
   if (cached) return NextResponse.json(JSON.parse(cached));
@@ -20,8 +20,7 @@ export async function GET() {
   ]);
 
   const stats = { totalDownloads, totalMessages, recentActivity };
-
-  await redisConnection.set(cacheKey, JSON.stringify(stats), 'EX', 60); // cache 60 detik
+  await redisConnection.set(cacheKey, JSON.stringify(stats), 'EX', 60);
 
   return NextResponse.json(stats);
 }

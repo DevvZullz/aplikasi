@@ -1,5 +1,8 @@
+// Worker ini HARUS dijalankan sebagai proses terpisah (bukan di Vercel).
+// Jalankan: npm run worker  di Railway/Render/VPS
+
 import { Worker } from 'bullmq';
-import { bullMQConnection } from '../lib/redis';
+import { redisConnectionOptions } from '../lib/redis';
 import { db } from '../lib/db';
 
 async function resolveSource(url: string): Promise<{ fileName: string; sizeBytes: number }> {
@@ -9,7 +12,7 @@ async function resolveSource(url: string): Promise<{ fileName: string; sizeBytes
 const worker = new Worker(
   'video-download',
   async (job: any) => {
-    const { jobId, url } = job.data as { jobId: string; url: string };
+    const { jobId, url } = job.data;
 
     await db.downloadJob.update({ where: { id: jobId }, data: { status: 'PROCESSING' } });
 
@@ -17,7 +20,12 @@ const worker = new Worker(
       const { fileName, sizeBytes } = await resolveSource(url);
       await db.downloadJob.update({
         where: { id: jobId },
-        data: { status: 'COMPLETED', fileName, fileSizeBytes: BigInt(sizeBytes), completedAt: new Date() },
+        data: {
+          status: 'COMPLETED',
+          fileName,
+          fileSizeBytes: BigInt(sizeBytes),
+          completedAt: new Date(),
+        },
       });
       await db.activityLog.create({
         data: { userId: job.data.userId, action: 'DOWNLOAD_COMPLETED', metadata: { jobId, fileName } },
@@ -29,7 +37,7 @@ const worker = new Worker(
       });
     }
   },
-  { connection: bullMQConnection, concurrency: 3 }
+  { connection: redisConnectionOptions, concurrency: 3 }
 );
 
 worker.on('failed', (job: any, err: any) => {

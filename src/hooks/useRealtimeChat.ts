@@ -11,25 +11,29 @@ export function useRealtimeChat(conversationId: string, userId: string) {
     if (!conversationId) return;
 
     const channel = supabase
-      .channel(`chat:${conversationId}`)
+      .channel('chat-' + conversationId)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` },
-        (payload) => setMessages((prev) => [...prev, payload.new])
-      )
-      .on('broadcast', { event: 'typing' }, ({ payload }) => {
-        if (payload.userId !== userId) {
-          const addUser = (prev: string[]) => {
-            const combined = prev.concat([payload.userId]);
-            const unique: string[] = [];
-            combined.forEach((id) => { if (!unique.includes(id)) unique.push(id); });
-            return unique;
-          };
-          setTypingUsers(addUser);
-          setTimeout(() => {
-            setTypingUsers((p) => p.filter((id) => id !== payload.userId));
-          }, 2000);
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: 'conversation_id=eq.' + conversationId,
+        },
+        (payload: any) => {
+          setMessages((prev: any[]) => [...prev, payload.new]);
         }
+      )
+      .on('broadcast', { event: 'typing' }, (data: any) => {
+        const senderId: string = data.payload.userId;
+        if (senderId === userId) return;
+        setTypingUsers((prev: string[]) => {
+          if (prev.indexOf(senderId) !== -1) return prev;
+          return prev.concat(senderId);
+        });
+        setTimeout(() => {
+          setTypingUsers((p: string[]) => p.filter((id: string) => id !== senderId));
+        }, 2000);
       })
       .subscribe();
 
@@ -39,11 +43,9 @@ export function useRealtimeChat(conversationId: string, userId: string) {
   }, [conversationId, userId]);
 
   const sendTyping = () => {
-    supabase.channel(`chat:${conversationId}`).send({
-      type: 'broadcast',
-      event: 'typing',
-      payload: { userId },
-    });
+    supabase
+      .channel('chat-' + conversationId)
+      .send({ type: 'broadcast', event: 'typing', payload: { userId } });
   };
 
   const markAsRead = async (messageId: string) => {

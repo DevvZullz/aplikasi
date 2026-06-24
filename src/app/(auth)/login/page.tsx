@@ -1,13 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
+function RegisteredNotice() {
+  const searchParams = useSearchParams();
+  if (!searchParams.get('registered')) return null;
+  return (
+    <div className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-600 dark:bg-green-900/20 dark:text-green-400">
+      Akun berhasil dibuat! Silakan masuk.
+    </div>
+  );
+}
+
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,13 +26,9 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       const res = await signIn('credentials', { email, password, redirect: false });
-      if (res?.error) {
-        setError('Email atau password salah');
-        return;
-      }
+      if (res?.error) { setError('Email atau password salah'); return; }
       router.push('/dashboard');
     } catch {
       setError('Terjadi kesalahan, coba lagi');
@@ -40,11 +45,9 @@ export default function LoginPage() {
           <p className="mt-1 text-sm text-zinc-500">Selamat datang kembali</p>
         </div>
 
-        {searchParams.get('registered') && (
-          <div className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-600 dark:bg-green-900/20 dark:text-green-400">
-            Akun berhasil dibuat! Silakan masuk.
-          </div>
-        )}
+        <Suspense fallback={null}>
+          <RegisteredNotice />
+        </Suspense>
 
         {error && (
           <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">

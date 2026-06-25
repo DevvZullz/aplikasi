@@ -9,8 +9,8 @@ function RegisteredNotice() {
   const searchParams = useSearchParams();
   if (!searchParams.get('registered')) return null;
   return (
-    <div className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-600 dark:bg-green-900/20 dark:text-green-400">
-      Akun berhasil dibuat! Silakan masuk.
+    <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-3 text-sm text-emerald-400">
+      ✓ Akun berhasil dibuat! Silakan masuk.
     </div>
   );
 }
@@ -38,55 +38,77 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-8">
-      <div className="w-full max-w-sm space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold">Masuk</h1>
-          <p className="mt-1 text-sm text-zinc-500">Selamat datang kembali</p>
+    <main className="flex min-h-screen items-center justify-center p-4">
+      <div className="w-full max-w-sm space-y-8">
+        {/* Logo & Branding */}
+        <div className="text-center space-y-2">
+          <h1 className="text-5xl font-black gradient-text">ZULLZ</h1>
+          <p className="text-purple-400 text-sm font-light tracking-widest">PREMIUM PLATFORM</p>
         </div>
 
-        <Suspense fallback={null}>
-          <RegisteredNotice />
-        </Suspense>
-
-        {error && (
-          <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
-            {error}
+        {/* Card */}
+        <div className="card-luxury space-y-6">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-bold">Selamat Datang</h2>
+            <p className="text-zinc-400 text-sm">Masuk ke akun premium Anda</p>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full rounded-lg border border-zinc-300 px-4 py-2.5 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full rounded-lg border border-zinc-300 px-4 py-2.5 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 font-medium text-white disabled:opacity-50 dark:bg-white dark:text-zinc-900"
-          >
-            {loading ? 'Masuk...' : 'Masuk'}
-          </button>
-        </form>
+          <Suspense fallback={null}>
+            <RegisteredNotice />
+          </Suspense>
 
-        <p className="text-center text-sm text-zinc-500">
-          Belum punya akun?{' '}
-          <Link href="/register" className="font-medium text-zinc-900 dark:text-white">
-            Daftar
-          </Link>
-        </p>
+          {error && (
+            <div className="rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400">
+              ⚠ {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-purple-300">EMAIL</label>
+              <input
+                type="email"
+                placeholder="nama@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-lg bg-zinc-900/50 border border-purple-500/20 focus:border-purple-500/60 outline-none text-white placeholder-zinc-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-purple-300">PASSWORD</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-lg bg-zinc-900/50 border border-purple-500/20 focus:border-purple-500/60 outline-none text-white placeholder-zinc-500"
+              />
+            </div>
+
+            {/* 3D Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-3d w-full mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'MASUK...' : 'MASUK'}
+            </button>
+          </form>
+
+          <div className="flex items-center gap-2 before:flex-1 before:h-px before:bg-purple-500/20 after:flex-1 after:h-px after:bg-purple-500/20">
+            <span className="text-xs text-zinc-500">ATAU</span>
+          </div>
+
+          <p className="text-center text-sm text-zinc-400">
+            Belum punya akun?{' '}
+            <Link href="/register" className="text-purple-400 hover:text-purple-300 font-semibold">
+              Daftar Sekarang
+            </Link>
+          </p>
+        </div>
       </div>
     </main>
   );

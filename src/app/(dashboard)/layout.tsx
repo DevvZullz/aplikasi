@@ -1,59 +1,53 @@
 import { auth, signOut } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session) redirect('/login');
 
+  const isAdmin = (session.user as any)?.role === 'ADMIN';
+
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="w-64 bg-gradient-to-b from-zinc-900 to-purple-950/30 border-r border-purple-500/20 p-6 space-y-8">
-        <div>
-          <h1 className="text-3xl font-black gradient-text">ZULLZ</h1>
-          <p className="text-purple-400 text-xs font-light mt-1">Premium Platform</p>
-        </div>
-
-        <nav className="space-y-3">
-          <NavLink href="/dashboard" label="Dashboard" icon="📊" />
-          <NavLink href="/products" label="Tabel Produk" icon="🛍️" />
-          <NavLink href="/chat-ai" label="Chat AI" icon="🤖" />
-          <NavLink href="/create" label="Create AI" icon="✨" />
-          <NavLink href="/profile" label="Akun Saya" icon="👤" />
-        </nav>
-
-        <div className="pt-6 border-t border-purple-500/20 space-y-3">
-          <p className="text-xs text-zinc-500 font-semibold">AKUN</p>
-          <div className="text-sm">
-            <p className="text-purple-300 font-semibold">{session.user?.name}</p>
-            <p className="text-zinc-500 text-xs">{session.user?.email}</p>
-          </div>
-          <form
-            action={async () => {
-              'use server';
-              await signOut({ redirectTo: '/login' });
-            }}
-          >
-            <button className="w-full mt-4 px-4 py-2 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-400 hover:bg-purple-500/20 text-sm font-semibold">
-              Keluar
-            </button>
+    <div className="flex flex-col min-h-screen">
+      {/* Top Header */}
+      <header className="bg-gradient-to-r from-zinc-900 to-purple-950/30 border-b border-purple-500/20 px-6 py-4 flex justify-between items-center">
+        <h1 className="text-2xl font-black gradient-text">Zullz Hosting</h1>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-zinc-400">{session.user?.name}</span>
+          {isAdmin && <span className="text-xs px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300">ADMIN</span>}
+          <form action={async () => { 'use server'; await signOut({ redirectTo: '/login' }); }}>
+            <button className="text-sm px-4 py-2 rounded-lg hover:bg-red-500/10 text-red-400 transition">Keluar</button>
           </form>
         </div>
-      </aside>
+      </header>
 
-      {/* Main content */}
+      {/* Main Content */}
       <main className="flex-1 overflow-auto">
-        <div className="p-8">{children}</div>
+        <div className="p-6 max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
+
+      {/* Bottom Navigation */}
+      <nav className="bg-gradient-to-t from-zinc-900 to-purple-950/30 border-t border-purple-500/20 px-6 py-4">
+        <div className="flex justify-center gap-4 max-w-7xl mx-auto">
+          <NavLink href="/dashboard/products" label="Produk" icon="🛍️" />
+          <NavLink href="/dashboard/chat-ai" label="Chat AI" icon="🤖" />
+          <NavLink href="/dashboard/create" label="Buat Gambar" icon="✨" />
+          <NavLink href="/dashboard/profile" label="Saya" icon="👤" />
+          {isAdmin && <NavLink href="/admin" label="Admin" icon="⚙️" />}
+        </div>
+      </nav>
     </div>
   );
 }
 
 function NavLink({ href, label, icon }: { href: string; label: string; icon: string }) {
   return (
-    <a href={href} className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-purple-500/10 border border-purple-500/10 hover:border-purple-500/30 transition group">
+    <a href={href} className="flex flex-col items-center gap-1 px-6 py-2 rounded-lg hover:bg-purple-500/10 border border-purple-500/10 hover:border-purple-500/30 transition group">
       <span className="text-xl group-hover:scale-110 transition">{icon}</span>
-      <span className="text-sm font-semibold text-zinc-300 group-hover:text-purple-300">{label}</span>
+      <span className="text-xs font-semibold text-zinc-300 group-hover:text-purple-300">{label}</span>
     </a>
   );
 }

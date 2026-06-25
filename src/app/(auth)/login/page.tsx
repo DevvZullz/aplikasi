@@ -15,7 +15,7 @@ function RegisteredNotice() {
   );
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +29,7 @@ export default function LoginPage() {
     try {
       const res = await signIn('credentials', { email, password, redirect: false });
       if (res?.error) { setError('Email atau password salah'); return; }
-      router.push('/dashboard');
+      router.push('/dashboard/products');
     } catch {
       setError('Terjadi kesalahan, coba lagi');
     } finally {
@@ -38,19 +38,16 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
+    <main className="flex min-h-screen items-center justify-center p-4 bg-gradient-to-br from-zinc-950 via-purple-950 to-zinc-950">
       <div className="w-full max-w-sm space-y-8">
-        {/* Logo & Branding */}
         <div className="text-center space-y-2">
-          <h1 className="text-5xl font-black gradient-text">ZULLZ</h1>
-          <p className="text-purple-400 text-sm font-light tracking-widest">PREMIUM PLATFORM</p>
+          <h1 className="text-5xl font-black"><span className="gradient-text">Z</span><span className="text-zinc-100">ullz</span> <span className="text-purple-400 text-2xl">Hosting</span></h1>
         </div>
 
-        {/* Card */}
         <div className="card-luxury space-y-6">
           <div className="space-y-1">
-            <h2 className="text-2xl font-bold">Selamat Datang</h2>
-            <p className="text-zinc-400 text-sm">Masuk ke akun premium Anda</p>
+            <h2 className="text-2xl font-bold">Masuk ke Akun</h2>
+            <p className="text-zinc-400 text-sm">Akses platform Zullz Hosting Anda</p>
           </div>
 
           <Suspense fallback={null}>
@@ -66,34 +63,15 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label className="text-xs font-semibold text-purple-300">EMAIL</label>
-              <input
-                type="email"
-                placeholder="nama@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-lg bg-zinc-900/50 border border-purple-500/20 focus:border-purple-500/60 outline-none text-white placeholder-zinc-500"
-              />
+              <input type="email" placeholder="nama@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-4 py-3 rounded-lg bg-zinc-900/50 border border-purple-500/20 focus:border-purple-500/60 outline-none text-white placeholder-zinc-500" />
             </div>
 
             <div className="space-y-2">
               <label className="text-xs font-semibold text-purple-300">PASSWORD</label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 rounded-lg bg-zinc-900/50 border border-purple-500/20 focus:border-purple-500/60 outline-none text-white placeholder-zinc-500"
-              />
+              <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-4 py-3 rounded-lg bg-zinc-900/50 border border-purple-500/20 focus:border-purple-500/60 outline-none text-white placeholder-zinc-500" />
             </div>
 
-            {/* 3D Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-3d w-full mt-8 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <button type="submit" disabled={loading} className="btn-3d w-full mt-8 disabled:opacity-50">
               {loading ? 'MASUK...' : 'MASUK'}
             </button>
           </form>
@@ -108,8 +86,20 @@ export default function LoginPage() {
               Daftar Sekarang
             </Link>
           </p>
+
+          <button onClick={() => router.push('/admin/login')} type="button" className="w-full px-4 py-2.5 rounded-lg bg-purple-500/5 border border-purple-500/30 text-purple-300 hover:bg-purple-500/10 text-sm font-semibold">
+            ⚙️ Login Admin
+          </button>
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
